@@ -529,7 +529,7 @@ function SideNode({ node, depth, color, api, dnd }) {
         onSelect={() => api.goTo(node.id)} onStartRename={() => api.setRenaming(node.id)} onRename={(v) => { api.rename(node.id, v); api.setRenaming(null); }}
         onAddChild={() => api.addChild(node.id, depth)} onDelete={() => api.remove(node)}
         draggable onDragStart={(e) => dnd.onDragStart(e, node)} onDragOver={(e) => dnd.overRow(e, node, depth)} onDrop={dnd.doDrop} onDragEnd={dnd.clearDrag} shadow={dnd.dropShadow(node.id)} dim={dnd.dragId === node.id} />
-      {kids(node).map((c) => <SideNode key={c.id} node={c} depth={depth + 1} color={color} api={sideApi} dnd={dnd} />)}
+      {kids(node).map((c) => <SideNode key={c.id} node={c} depth={depth + 1} color={color} api={api} dnd={dnd} />)}
     </>
   );
 }
