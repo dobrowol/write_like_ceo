@@ -50,11 +50,11 @@ function download(name, text) { const b = new Blob([text], { type: "text/plain;c
 const hasLocal = () => { try { const k = "__edt"; localStorage.setItem(k, "1"); localStorage.removeItem(k); return true; } catch { return false; } };
 const persistent = () => (typeof window !== "undefined" && window.storage) || hasLocal();
 const store = {
-  async get(key) {
+  load: async (key) => {
     if (typeof window !== "undefined" && window.storage) { try { const r = await window.storage.get(key); return r && r.value != null ? r.value : null; } catch { return null; } }
     try { return localStorage.getItem(key); } catch { return null; }
   },
-  async set(key, value) {
+  save: async (key, value) => {
     if (typeof window !== "undefined" && window.storage) { await window.storage.set(key, value); return; }
     localStorage.setItem(key, value);
   },
@@ -154,10 +154,10 @@ export default function Edytor() {
     if (!user) {
       (async () => {
         try {
-          const raw = await store.get("workspace");
+          const raw = await store.load("workspace");
           let ws = raw ? JSON.parse(raw) : null;
           if (!ws) {
-            const old = await store.get("dokument");
+            const old = await store.load("dokument");
             if (old) { const t = JSON.parse(old); if (Array.isArray(t) && t.length) ws = { docs: [{ id: uid(), title: "Dokument", tree: t }], activeId: null }; }
           }
           if (ws && Array.isArray(ws.docs) && ws.docs.length) {
@@ -197,7 +197,7 @@ export default function Edytor() {
       setStatus("zapisuję…");
       const t = setTimeout(async () => {
         try {
-          await store.set("workspace", JSON.stringify({ docs, activeId }));
+          await store.save("workspace", JSON.stringify({ docs, activeId }));
           if (fileHandle.current) { try { await writeHandle(fileHandle.current, JSON.stringify({ version: 1, docs }, null, 2)); } catch {} }
           setStatus(fileHandle.current ? `zapisano: ${fileName}` : "zapisane");
         } catch { setStatus("pamięć sesji"); }
