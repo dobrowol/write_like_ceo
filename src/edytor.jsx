@@ -359,7 +359,7 @@ export default function Edytor() {
   }, [docs, fileName, fsSupported]);
 
   const dnd = { onDragStart, overRow, doDrop, clearDrag, dropShadow, dragId: drag && drag.id };
-  const api = { selId, renaming, goTo, setRenaming, rename, addChild, remove };
+  const sideApi = { selId, renaming, goTo, setRenaming, rename, addChild, remove };
 
   return (
     <div style={{ height: "calc(100vh - 48px)", display: "flex", fontFamily: SANS, color: C.ink, background: C.paper }} onClick={() => { if (expOpen) setExpOpen(false); if (docsOpen) setDocsOpen(false); }}>
@@ -435,7 +435,7 @@ export default function Edytor() {
         </div>
         <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "8px 8px 24px" }} onDragOver={(e) => drag && e.preventDefault()} onDrop={doDrop}>
           {doc.length === 0 && <p style={{ color: C.faint, fontSize: 13, padding: "20px 12px", lineHeight: 1.5 }}>Pusto. Dodaj pierwszy paragraf.</p>}
-          {doc.map((p, i) => <SideNode key={p.id} node={p} depth={0} color={colorAt(i)} api={api} dnd={dnd} />)}
+          {doc.map((p, i) => <SideNode key={p.id} node={p} depth={0} color={colorAt(i)} api={sideApi} dnd={dnd} />)}
         </div>
         <div style={{ padding: "10px 16px", borderTop: `1px solid ${C.line}`, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12, color: C.faint }}>
           <span>{words} słów · {status}</span>
@@ -529,7 +529,7 @@ function SideNode({ node, depth, color, api, dnd }) {
         onSelect={() => api.goTo(node.id)} onStartRename={() => api.setRenaming(node.id)} onRename={(v) => { api.rename(node.id, v); api.setRenaming(null); }}
         onAddChild={() => api.addChild(node.id, depth)} onDelete={() => api.remove(node)}
         draggable onDragStart={(e) => dnd.onDragStart(e, node)} onDragOver={(e) => dnd.overRow(e, node, depth)} onDrop={dnd.doDrop} onDragEnd={dnd.clearDrag} shadow={dnd.dropShadow(node.id)} dim={dnd.dragId === node.id} />
-      {kids(node).map((c) => <SideNode key={c.id} node={c} depth={depth + 1} color={color} api={api} dnd={dnd} />)}
+      {kids(node).map((c) => <SideNode key={c.id} node={c} depth={depth + 1} color={color} api={sideApi} dnd={dnd} />)}
     </>
   );
 }
