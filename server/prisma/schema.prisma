@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  documents   Document[]
+  betaReading BetaReader[]
+  reviews     Review[]
+  ratings     Rating[]
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  tree      Json     @default("[]")
+  phase     Phase    @default(DRAFT_1)
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author      User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  betaReaders BetaReader[]
+  reviews     Review[]
+  ratings     Rating[]
+}
+
+enum Phase {
+  DRAFT_1
+  DRAFT_2
+  DRAFT_3
+  BETA
+  PUBLISHED
+}
+
+model BetaReader {
+  id         String     @id @default(cuid())
+  documentId String
+  userId     String
+  status     BetaStatus @default(PENDING)
+  createdAt  DateTime   @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
+
+enum BetaStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  rating     Int
+  text       String
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
+
+model Rating {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  value      Int
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
