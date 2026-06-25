@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     const docs = await prisma.document.findMany({
       where: { authorId: req.user.id },
       orderBy: { updatedAt: 'desc' },
-      select: { id: true, title: true, phase: true, published: true, createdAt: true, updatedAt: true },
+      select: { id: true, title: true, tree: true, phase: true, published: true, createdAt: true, updatedAt: true },
     })
     res.json(docs)
   } catch {
